@@ -56,3 +56,6 @@ wheels/
 /.vs/handpose-control/v16/.suo
 /.vs/PythonSettings.json
 /.vs/slnx.sqlite
+/.vs/handpose-control/config/applicationhost.config
+/.vs/launch.vs.json
+/.vs/VSWorkspaceState.json

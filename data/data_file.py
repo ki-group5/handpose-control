@@ -12,6 +12,7 @@ class Label(Enum):
     Flat = "flat"
     Fist = "fist"
     Index = "index"
+    Stop = "stop"
 
     def __str__(self) -> str:
         return self.value
