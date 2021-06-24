@@ -10,9 +10,9 @@ from utils.normalized import NormalizedData
 
 def train_centroid_classifier(model_filename='01.json'):
     loader = DataLoader(Path("../../data/"))
-    data = list(loader.load_all())
+    data = loader.load_all()
     unique_labels = set(entry.label for entry in data)
-    centroids = {label: np.zeros(data[0].landmarks.shape) for label in unique_labels}
+    centroids = {label: [] for label in unique_labels}
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
@@ -34,7 +34,7 @@ def train_centroid_classifier(model_filename='01.json'):
         cutoff = max(cutoff, max_distance)
 
     classifier_data = {
-        'classifier': {label: centroid.tolist() for label, centroid in centroids.items()},
+        'classifier': {str(label): centroid.tolist() for label, centroid in centroids.items()},
         'cutoff': cutoff
     }
 

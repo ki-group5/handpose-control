@@ -20,7 +20,7 @@ class DataLoader:
     def __init__(self, path: Path) -> None:
         self.path = path
 
-    def load_all(self) -> Iterator[LabelledEntry]:
+    def iter_load_all(self) -> Iterator[LabelledEntry]:
         for p in self.path.iterdir():
             if p.is_dir():
                 try:
@@ -33,6 +33,8 @@ class DataLoader:
                         for lm in file.landmarks:
                             yield LabelledEntry(label, lm, file.hand)
 
+    def load_all(self) -> List[LabelledEntry]:
+        return list(self.iter_load_all())
 
 
 if __name__ == "__main__":
