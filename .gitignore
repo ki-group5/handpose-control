@@ -52,3 +52,7 @@ wheels/
 
 # VSCode
 .vscode/
+/.vs/ProjectSettings.json
+/.vs/handpose-control/v16/.suo
+/.vs/PythonSettings.json
+/.vs/slnx.sqlite
