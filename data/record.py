@@ -9,35 +9,18 @@ python3 data/record.py Fist
 
 """
 
-import os
+
 from pathlib import Path
+from data.data_file import Hand, Label, RecordFile
 from typing import List
 import numpy as np
 import time
-import json
-from enum import Enum
 from dataclasses import dataclass
 
 import argparse
 import cv2
 import mediapipe as mp
 
-
-class Label(Enum):
-    Undefined = "undefined"
-    Hand = "hand"
-    Fist = "fist"
-
-    def __str__(self) -> str:
-        return self.value
-
-
-class Hand(Enum):
-    Left = "left"
-    right = "right"
-
-    def __str__(self) -> str:
-        return self.value
 
 
 def convert_mediapipe_to_numpy(landmarks) -> np.ndarray:
@@ -95,26 +78,6 @@ def record_landmarks(duration: float = 10.0) -> List[np.ndarray]:
 
 
 
-@dataclass
-class RecordFile:
-    landmarks: List[np.ndarray]
-    hand: Hand
-
-    def store(self, path: Path):
-        obj = {
-            "landmark_frames": [x.tolist() for x in self.landmarks]
-        }
-        with path.open('wt') as fp:
-            json.dump(obj, fp)
-
-    @classmethod
-    def load(cls, path):
-        with os.open(path, 'rt') as fp:
-            obj = json.load(fp)
-        cls(
-            [np.asarray(x) for x in obj["landmark_frames"]],
-            Hand[obj["hand"]]
-        )
 
 def main_record():
     parser = argparse.ArgumentParser()
