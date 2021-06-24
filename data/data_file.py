@@ -13,6 +13,10 @@ class Label(Enum):
     Fist = "fist"
     Index = "index"
     Stop = "stop"
+    Ok = "ok"
+    Arrow = "arrow"
+    ThumbUp = "thumbup"
+    ThumbDown = "thumbdown"
 
     def __str__(self) -> str:
         return self.value
