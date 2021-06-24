@@ -8,6 +8,7 @@ class KMeansClassifier:
         deserialized_classifier = pickle.loads(serialized_classifier)
         self.classifier = deserialized_classifier['classifier']
         self.cutoff = deserialized_classifier['cutoff']
+        self.label_mapping = deserialized_classifier['label_mapping']
 
     def classify(self, data):
         """Find closest cluster to data point. Return None if distance is larger than cutoff."""
@@ -16,4 +17,4 @@ class KMeansClassifier:
         min_index = cluster_distance_space.argmin()
         min_distance = cluster_distance_space[min_index]
         if min_distance < self.cutoff:
-            return min_index
+            return self.label_mapping[min_index]
