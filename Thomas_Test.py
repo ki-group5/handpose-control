@@ -1,0 +1,3 @@
+﻿from classifier.centroid.train_centroid_classifier import train_centroid_classifier
+
+train_centroid_classifier()
