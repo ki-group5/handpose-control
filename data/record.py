@@ -15,16 +15,29 @@ from typing import List
 import numpy as np
 import time
 import json
-from enum import IntEnum
+from enum import Enum
+from dataclasses import dataclass
 
 import argparse
 import cv2
 import mediapipe as mp
 
-class Labels(IntEnum):
-    Undefined = 1
-    Hand = 2
-    Fist = 3
+
+class Label(Enum):
+    Undefined = "undefined"
+    Hand = "hand"
+    Fist = "fist"
+
+    def __str__(self) -> str:
+        return self.value
+
+
+class Hand(Enum):
+    Left = "left"
+    right = "right"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 def convert_mediapipe_to_numpy(landmarks) -> np.ndarray:
@@ -81,23 +94,37 @@ def record_landmarks(duration: float = 10.0) -> List[np.ndarray]:
     return landmarks
 
 
-def store(landmarks: List[np.ndarray], path: Path):
-    obj = {
-        "landmark_frames": [x.tolist() for x in landmarks]
-    }
 
-    with path.open('wt') as fp:
-        json.dump(obj, fp)
+@dataclass
+class RecordFile:
+    landmarks: List[np.ndarray]
+    hand: Hand
 
+    def store(self, path: Path):
+        obj = {
+            "landmark_frames": [x.tolist() for x in self.landmarks]
+        }
+        with path.open('wt') as fp:
+            json.dump(obj, fp)
+
+    @classmethod
+    def load(cls, path):
+        with os.open(path, 'rt') as fp:
+            obj = json.load(fp)
+        cls(
+            [np.asarray(x) for x in obj["landmark_frames"]],
+            Hand[obj["hand"]]
+        )
 
 def main_record():
     parser = argparse.ArgumentParser()
-    parser.add_argument("label", type=str)
+    parser.add_argument("label", type=Label, choices=list(Label))
+    parser.add_argument("hand", type=Hand, choices=list(Hand))
     parser.add_argument("-d","--duration", type=float)
     
     args = parser.parse_args()
 
-    label = Labels[args.label]
+    label: Label = args.label
 
     print(f"Recording label: {label}")
     landmarks = record_landmarks()
@@ -112,8 +139,9 @@ def main_record():
         i += 1
         file = path.joinpath(f"run.{i}.json")
 
-    store(landmarks, file)
-
+    data = RecordFile(landmarks, args.hand)
+    data.store(file)
+    
 
 if __name__ == "__main__":
     main_record()
