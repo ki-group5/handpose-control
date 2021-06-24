@@ -4,10 +4,10 @@ import numpy as np
 
 
 class CentroidClassifier:
-    def __init__(self, classifier_file=None):
-        if classifier_file is None:
-            classifier_file = os.path.dirname(os.path.abspath(__file__)) + '/params/01.json'
-        deserialized_classifier = json.load(classifier_file)
+    def __init__(self, classifier_file='01.json'):
+        classifier_file = f'{os.path.dirname(os.path.abspath(__file__))}/params/{classifier_file}'
+        with open(classifier_file) as f:
+            deserialized_classifier = json.load(f)
         self.centroids = {
             label: np.array(centroid) for label, centroid in
             deserialized_classifier['classifier'].items()

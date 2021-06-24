@@ -27,8 +27,12 @@ class NormalizedData:
     hand: str  # "Left" or "Right" hand
 
     @classmethod
-    def create(cls, landmarks, hand: str) -> "NormalizedData":
+    def create_from_mediapipe(cls, landmarks, hand: str) -> "NormalizedData":
         data = convert_mediapipe_to_numpy(landmarks)
+        return cls.create(data, hand)
+
+    @classmethod
+    def create(cls, data, hand: str) -> "NormalizedData":
         dzero = data - data[HL.WRIST]
 
         # Calculate orienation
@@ -37,13 +41,10 @@ class NormalizedData:
         normal = np.cross(u, v)
         normal /= np.linalg.norm(normal)
 
-        hand = hand
-
         # print(hand.classification)
 
-        if hand == "Left": # Invert normal when left hand...
+        if hand == "Left":  # Invert normal when left hand...
             normal = -normal
-
 
         # Calculate direction
         direction = np.array([

@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 
+from classifier.centroid.centroid_classifier import CentroidClassifier
 from utils.render import PoseRender
 from utils.normalized import NormalizedData
 from vec_math import Quat
@@ -16,6 +17,8 @@ def example_normalization():
     mp_drawing = mp.solutions.drawing_utils
     # mp_hands = mp.solutions.hands
     mp_holistic = mp.solutions.holistic
+
+    classifier = CentroidClassifier()
 
     # For webcam input:
     cap = cv2.VideoCapture(0)
@@ -49,17 +52,23 @@ def example_normalization():
                 image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             mp_drawing.draw_landmarks(
                 image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            # mp_drawing.draw_landmarks(
-            #     image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+            mp_drawing.draw_landmarks(
+                image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
 
 
             if results.left_hand_landmarks:
-                left = NormalizedData.create(results.left_hand_landmarks.landmark, "Left")
+                left = NormalizedData.create_from_mediapipe(results.left_hand_landmarks.landmark, "Left")
                 PoseRender.draw_normal(left, image)
+                prediction = classifier.classify(left.direction)
+                cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
             if results.right_hand_landmarks:
-                right = NormalizedData.create(results.right_hand_landmarks.landmark, "Right")
+                right = NormalizedData.create_from_mediapipe(results.right_hand_landmarks.landmark, "Right")
                 PoseRender.draw_normal(right, image)
+                prediction = classifier.classify(right.direction)
+                cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
 
             cv2.imshow('MediaPipe Holistic', image)

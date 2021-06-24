@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, List
-from data.data_file import Label, RecordFile
+from data.data_file import Label, RecordFile, Hand
 from pathlib import Path
 import numpy as np
 
@@ -12,6 +12,7 @@ import numpy as np
 class LabelledEntry:
     label: Label
     landmarks: np.ndarray
+    hand: Hand
 
 
 
@@ -30,8 +31,8 @@ class DataLoader:
                     if f.name.startswith("run.") and f.name.endswith(".json"):
                         file = RecordFile.load(f.resolve())
                         for lm in file.landmarks:
-                            yield LabelledEntry(label, lm)
-            
+                            yield LabelledEntry(label, lm, file.hand)
+
 
 
 if __name__ == "__main__":
