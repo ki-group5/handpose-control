@@ -1,6 +1,6 @@
 
 
-from data.normalized import NormalizedData
+from utils.normalized import NormalizedData
 import math
 from typing import Optional, Tuple
 

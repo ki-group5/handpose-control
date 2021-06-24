@@ -6,7 +6,7 @@ by a simple hand pose classifier. The orientation and positional data then can b
 
 """
 from numpy.linalg import norm
-from data.converter import convert_mediapipe_to_numpy
+from utils.converter import convert_mediapipe_to_numpy
 from dataclasses import dataclass
 from typing import Union, Tuple
 
@@ -24,11 +24,10 @@ class NormalizedData:
     data: np.ndarray  # Original data (nparray: 21x3)
     direction: np.ndarray  # nparray: 20x3
     normal: np.ndarray  # Orientation normal (vec3)
-    handed_label: str  # "Left" or "Right" hand
-    handed_score: float  # propability if left or right hand
+    hand: str  # "Left" or "Right" hand
 
     @classmethod
-    def create(cls, landmarks, handed) -> "NormalizedData":
+    def create(cls, landmarks, hand: str) -> "NormalizedData":
         data = convert_mediapipe_to_numpy(landmarks)
         dzero = data - data[HL.WRIST]
 
@@ -38,12 +37,11 @@ class NormalizedData:
         normal = np.cross(u, v)
         normal /= np.linalg.norm(normal)
 
-        handed_label = list(handed.classification)[0].label
-        handed_score = list(handed.classification)[0].score
+        hand = hand
 
-        # print(handed.classification)
+        # print(hand.classification)
 
-        if handed_label == "Left": # Invert normal when left hand...
+        if hand == "Left": # Invert normal when left hand...
             normal = -normal
 
 
@@ -85,4 +83,4 @@ class NormalizedData:
         quat = Quat.create_from_to(normal, (1, 0, 0))
         direction = quat * direction
 
-        return cls(data, direction, normal, handed_label, handed_score)
+        return cls(data, direction, normal, hand)
