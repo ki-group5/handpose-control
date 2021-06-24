@@ -1,5 +1,6 @@
 import json
 import os
+import numpy as np
 
 
 def load_data():
@@ -11,8 +12,10 @@ def load_data():
     for label in labels:
         datafolder = datadir + label
         for datafile in os.listdir(datafolder):
+            if os.path.splitext(datafile)[1] != '.json':
+                continue
             with open(datafile) as f:
-                dataset[label] = json.load(f)
+                dataset[label] = np.array(json.load(f)['landmark_frames'])
     return dataset
 
 
