@@ -2,5 +2,5 @@
 from example_camera import example_normalization
 
 
-#train_centroid_classifier()
+train_centroid_classifier()
 example_normalization()
