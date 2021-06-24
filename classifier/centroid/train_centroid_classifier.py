@@ -2,7 +2,7 @@ import json
 import os
 import numpy as np
 
-from ...load_data import load_data
+from load_data import load_data
 
 
 def train_centroid_classifier(model_filename='01.json'):
@@ -23,10 +23,13 @@ def train_centroid_classifier(model_filename='01.json'):
         cutoff = max(cutoff, max_distance)
 
     classifier_data = {
-        'classifier': centroids,
+        'classifier': {label: centroid.tolist() for label, centroid in centroids.items()},
         'cutoff': cutoff
     }
 
     model_filename = f'{os.path.dirname(os.path.abspath(__file__))}/params/{model_filename}'
     with open(model_filename, 'w') as f:
         json.dump(classifier_data, f)
+
+if __name__ == '__main__':
+    train_centroid_classifier()
