@@ -9,7 +9,7 @@ from utils.normalized import NormalizedData
 
 
 def train_centroid_classifier(model_filename='01.json'):
-    loader = DataLoader(Path("./data/"))
+    loader = DataLoader(Path("../../data/"))
     data = list(loader.load_all())
     unique_labels = set(entry.label for entry in data)
     centroids = {label: np.zeros(data[0].landmarks.shape) for label in unique_labels}
