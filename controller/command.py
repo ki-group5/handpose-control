@@ -74,8 +74,8 @@ class Command:
 
 
 Commands: Dict[str, List[Cmd]] = {
-    "stop": [Cmd("flat", 0.9), Cmd("fist", 0.9), Cmd("flat", 0.9)],
-    "continue": [Cmd("index", 0.9), Cmd("fist", 0.9)]
+    "stop": [Cmd("flat", 0.9), Cmd("fist", 0.8), Cmd("flat", 0.9)],
+    "continue": [Cmd("index", 0.9), Cmd("fist", 0.8)]
 }
 
 
