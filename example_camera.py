@@ -7,7 +7,7 @@ import numpy as np
 
 from classifier.centroid.centroid_classifier import CentroidClassifier
 from utils.render import PoseRender
-from utils.normalized import NormalizedData
+from utils.distance_normalization import NormalizedData
 from vec_math import Quat
 
 
@@ -83,8 +83,8 @@ def example_normalization():
                 # left_reconstr = left.reconstruct()
                 # PoseRender.render_landmarks(image, left_reconstr, mp_holistic.HAND_CONNECTIONS)
                 
-                PoseRender.draw_normal(left, image)
-                prediction = classifier.classify(left.direction)
+                # PoseRender.draw_normal(left, image)
+                prediction = classifier.classify(left.distance)
                 cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
@@ -99,8 +99,8 @@ def example_normalization():
                 # right_reconstr = right.reconstruct()
                 # PoseRender.render_landmarks(image, right_reconstr, mp_holistic.HAND_CONNECTIONS)
 
-                PoseRender.draw_normal(right, image)
-                prediction = classifier.classify(right.direction)
+                # PoseRender.draw_normal(right, image)
+                prediction = classifier.classify(right.distance)
                 cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
