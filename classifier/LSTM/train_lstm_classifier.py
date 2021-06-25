@@ -41,6 +41,7 @@ def train_lstm_classifier(model_filename='01.json'):
     print(y_train[99])
     model.fit(x_train, y_train, batch_size=300, epochs=20)
 
+    y_result = model.predict(x_train[0])
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
