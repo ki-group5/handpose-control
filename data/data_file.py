@@ -10,12 +10,12 @@ from dataclasses import dataclass
 class Label(Enum):
     Undefined = "undefined"
     Flat = "flat"
-    Fist = "fist"
+    fist = "fist"
     Index = "index"
-    # Stop = "stop"
+    Stop = "stop"
     Ok = "ok"
-    # Arrow = "arrow"
-    # ThumbUp = "thumbup"
+    Arrow = "arrow"
+    ThumbUp = "thumbup"
     # ThumbDown = "thumbdown"
 
     def __str__(self) -> str:
