@@ -20,6 +20,9 @@ def train_centroid_classifier(model_filename='01.json'):
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
+        #print(entry.hand.name)
+        #print(entry.label)
+        #print(normalized_data)
         # TODO: use normalized_data.normal ?
         centroids[entry.label].append(normalized_data.direction)
 
