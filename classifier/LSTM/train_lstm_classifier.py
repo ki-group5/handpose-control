@@ -46,6 +46,7 @@ def train_lstm_classifier(model_filename='01.json'):
     data2_shaped = x_train[0].reshape(1,10,21)
     y_result = model.predict(data2_shaped)
     print(y_result)
+    print("Predict Result")
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
