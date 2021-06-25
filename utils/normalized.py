@@ -86,8 +86,8 @@ class NormalizedData:
         # rotation = np.linalg.inv(np.eye(3))
         # direction = rotation.dot(direction.T).T
 
-        quat = Quat.create_from_to(normal, (1, 0, 0))
-        direction = quat * direction
+        # quat = Quat.create_from_to(normal, (1, 0, 0))
+        # direction = quat * direction
 
         return cls(data, direction, normal, hand, None)
 

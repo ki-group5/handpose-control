@@ -14,7 +14,7 @@ from vec_math import Quat
 
 Commands: Dict[str, List[Cmd]] = {
     "stop": [Cmd("fist", 0.8, 2.0), Cmd("flat", 0.2, 1.0), Cmd("fist", 0.8, 20.0)],
-    # "continue": [Cmd("index", 0.3, 20.0), Cmd("fist", 1.0, 2.0)]
+    "continue": [Cmd("index", 0.3, 20.0), Cmd("fist", 1.0, 2.0)]
 }
 
 
