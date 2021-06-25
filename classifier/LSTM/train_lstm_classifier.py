@@ -36,9 +36,9 @@ def train_lstm_classifier(model_filename='01.json'):
                 metrics=['accuracy'])
 
     x_train = np.random.random((100, 10, 21))
-    #print(x_train)
+    #print(x_train[99])
     y_train = np.random.random((100, 1))
-    print(y_train)
+    print(y_train[99])
     model.fit(x_train, y_train, batch_size=300, epochs=20)
 
 
