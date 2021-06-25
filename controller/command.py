@@ -1,4 +1,5 @@
 
+from data.data_file import Label
 from functools import cmp_to_key
 
 from numpy.linalg import solve
@@ -25,7 +26,6 @@ class Confidence:
 
         mvgf = min(max(self.mvg_avg_factor * dt, 0.0), 1.0)
         self.values = (self.values * (1.0-mvgf)) + (delta * mvgf)
-        # print(self.values)
 
     def max(self) -> Optional[Tuple[str, float]]:
         ind = np.argmax(self.values)
@@ -73,9 +73,9 @@ class Command:
         print("Command called: ", self.name)
 
 
-Commands: Dict[str, List[Cmd]] = {
-    "stop": [Cmd("flat", 0.9), Cmd("fist", 0.8), Cmd("flat", 0.9)],
-    "continue": [Cmd("index", 0.9), Cmd("fist", 0.8)]
+DEFAULT_COMMANDS: Dict[str, List[Cmd]] = {
+    "stop": [Cmd("flat", 0.8), Cmd("thumbup", 0.8), Cmd("flat", 0.8)],
+    "continue": [Cmd("index", 0.8), Cmd("thumbup", 0.8)]
 }
 
 
@@ -87,31 +87,30 @@ class CommandState:
     def reset(self):
         self.index = 0
 
-    def consume(self, label: str, value: float) -> bool:
+    def notify_change(self, label: str) -> bool:
         element = self.cmd.chain[self.index]
-        if element.label != label:
-            return False
-        
-        # print(f"{value:.1f}, ", end=None)
-
-        # print(element.value, value)
-        if element.value <= value:
+        # print(self.index, element.label)
+        if element.label == label:
             self.index += 1
             if self.index == len(self.cmd.chain):
-                # Trigger
-                self.cmd()
+                self.index = 0
                 return True
         return False
 
-
 class Commander:
-    def __init__(self, commands: Dict[str, List[Cmd]], labels: List[str]) -> None:
+    def __init__(self, labels: List[str], commands: Dict[str, List[Cmd]] = None) -> None:
         self.confidence = Confidence(labels)
+        self.current_label: str = Label.Undefined.value
+
+        if commands is None:
+            commands = DEFAULT_COMMANDS
+
         self.commands = [CommandState(Command(cname, clist))
                          for cname, clist in commands.items()]
         self.timestamp = time.time()
 
-    def push(self, label: Optional[str]):
+    def push(self, label: Optional[str]) -> Optional[str]:
+        # print(label)
         t = time.time()
         dt = t - self.timestamp
         self.timestamp = t
@@ -119,13 +118,21 @@ class Commander:
         self.confidence.update(dt, label)
         mlabel, mconf = self.confidence.max()
 
-        do_reset = False
-        for c in self.commands:
-            if c.consume(mlabel, mconf):
-                do_reset= True
-                break
+        
+        cmd: Optional[str] = None
+        if label is not None:
+            if mlabel != self.current_label:
+                # State changed!!!
+                # print("State changed", mlabel, mconf)
+                self.current_label = mlabel
+                for c in self.commands:
+                    if c.notify_change(mlabel):
+                        cmd = c.cmd.name
+                        break
 
-        if do_reset:
-            self.confidence.reset()
-            for c in self.commands:
-                c.reset()
+            if cmd:
+                for c in self.commands:
+                    c.reset()
+        
+        return cmd
+

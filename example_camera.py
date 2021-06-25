@@ -12,10 +12,6 @@ from vec_math import Quat
 
 
 
-COMMANDS: Dict[str, List[Cmd]] = {
-    "stop": [Cmd("flat", 0.9), Cmd("fist", 0.9), Cmd("flat", 0.9)],
-    "continue": [Cmd("index", 0.9), Cmd("fist", 0.9)]
-}
 
 
 
@@ -36,9 +32,10 @@ def example_normalization():
     # Command state machine from pose
     labels = [l.value for l in Label]
 
-    commander_left = Commander(COMMANDS, labels)
-    commander_right = Commander(COMMANDS, labels)
+    commander_left = Commander(labels)
+    commander_right = Commander(labels)
     
+    freeze_result_image = False
 
     # For webcam input:
     cap = cv2.VideoCapture(0)
@@ -89,7 +86,11 @@ def example_normalization():
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
 
-                commander_left.push(prediction)
+                cmd = commander_left.push(prediction)
+                if cmd:
+                    freeze_result_image = True
+                    cv2.putText(image, f'Cmd: {cmd}', color=(0, 0, 255), org=(100, 200),
+                                fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
             else:
                 commander_left.push(None)
 
@@ -104,9 +105,13 @@ def example_normalization():
                 cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
-                commander_right.push(prediction)
+                cmd = commander_right.push(prediction)
+                if cmd:
+                    freeze_result_image = True
+                    cv2.putText(image, f'Cmd: {cmd}', color=(0, 0, 255), org=(100, 200),
+                                fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
             else:
-                commander_left.push(None)
+                commander_right.push(None)
 
             # command_left = detect_commands(Commands, states_left)
             # if command_left:
@@ -120,6 +125,11 @@ def example_normalization():
             #     print("Right command:", command_right)
 
             cv2.imshow('MediaPipe Holistic', image)
+            if freeze_result_image:
+                freeze_result_image = False
+                if cv2.waitKey(500) & 0xFF == 27:
+                    break
+
             if cv2.waitKey(5) & 0xFF == 27:
                 break
     cap.release()

@@ -10,7 +10,7 @@ from utils.distance_normalization import NormalizedData
 
 
 def train_centroid_classifier(model_filename='01.json'):
-    loader = DataLoader(Path("../../data/"))
+    loader = DataLoader(Path("data/"))
     data = loader.load_all()
     unique_labels = set(entry.label for entry in data)
     centroids = {label: [] for label in unique_labels}
