@@ -23,6 +23,7 @@ Vec4 = Union[Tuple[float, float, float, float], np.ndarray]
 class NormalizedData:
     data: np.ndarray  # Original data (nparray: 21x3)
     direction: np.ndarray  # nparray: 20x3
+    normalized: np.ndarray  # nparray: 20x1
     normal: np.ndarray  # Orientation normal (vec3)
     hand: str  # "Left" or "Right" hand
     rotation: Optional[np.ndarray] = None
@@ -46,6 +47,8 @@ class NormalizedData:
 
         if hand == "Left":  # Invert normal when left hand...
             normal = -normal
+
+        normalized = np.linalg.norm(dzero[1:], axis=1)
 
         # Calculate direction
         direction = np.array([
@@ -89,7 +92,7 @@ class NormalizedData:
         # quat = Quat.create_from_to(normal, (1, 0, 0))
         # direction = quat * direction
 
-        return cls(data, direction, normal, hand, None)
+        return cls(data, direction, normalized, normal, hand, None)
 
     def reconstruct(self) -> np.ndarray:
         # d = self.direction * 0.05

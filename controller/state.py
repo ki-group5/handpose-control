@@ -11,7 +11,7 @@ class Confidence:
     def __init__(self, labels: List[str]) -> None:
         self.labels = labels
         self.values = np.zeros(len(labels))
-        self.mvg_avg_factor = 1.0
+        self.mvg_avg_factor = 1.1
 
     def update(self, dt: float, label: Optional[str] = None):
         delta = np.zeros(len(self.labels))
@@ -70,6 +70,7 @@ class StateStream:
         self.current.update_duration(t)
         if conf and self.current.label != conf:
             self.states.append(State(conf))
+            print(conf)
             self._cleanup()
             return True
 

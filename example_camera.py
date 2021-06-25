@@ -35,7 +35,8 @@ def example_normalization():
 
     # Command state machine from pose
     labels = [l.value for l in Label]
-    states = StateStream(labels, 10)
+    states_left = StateStream(labels, 10)
+    states_right = StateStream(labels, 10)
     
 
     # For webcam input:
@@ -66,10 +67,10 @@ def example_normalization():
 
             # mp_drawing.draw_landmarks(
             #     image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
-            # mp_drawing.draw_landmarks(
-            #     image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            # mp_drawing.draw_landmarks(
-            #     image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            mp_drawing.draw_landmarks(
+                image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            mp_drawing.draw_landmarks(
+                image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             # mp_drawing.draw_landmarks(
             #     image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
 
@@ -78,32 +79,43 @@ def example_normalization():
             if results.left_hand_landmarks:
                 left = NormalizedData.create_from_mediapipe(results.left_hand_landmarks.landmark, "Left")
 
-                left_reconstr = left.reconstruct()
-                PoseRender.render_landmarks(image, left_reconstr, mp_holistic.HAND_CONNECTIONS)
+                # left_reconstr = left.reconstruct()
+                # PoseRender.render_landmarks(image, left_reconstr, mp_holistic.HAND_CONNECTIONS)
                 
                 PoseRender.draw_normal(left, image)
                 prediction = classifier.classify(left.direction)
                 cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
+                states_left.push(prediction)
+            else:
+                states_left.push(None)
+
             if results.right_hand_landmarks:
                 right = NormalizedData.create_from_mediapipe(results.right_hand_landmarks.landmark, "Right")
 
-                right_reconstr = right.reconstruct()
-                PoseRender.render_landmarks(image, right_reconstr, mp_holistic.HAND_CONNECTIONS)
+                # right_reconstr = right.reconstruct()
+                # PoseRender.render_landmarks(image, right_reconstr, mp_holistic.HAND_CONNECTIONS)
 
                 PoseRender.draw_normal(right, image)
                 prediction = classifier.classify(right.direction)
                 cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
-                states.push(prediction)
+                states_right.push(prediction)
+            else:
+                states_right.push(None)
+
+            command_left = detect_commands(Commands, states_left)
+            if command_left:
+                states_left.clear()
+                print("Left command:", command_left)
 
 
-            command = detect_commands(Commands, states)
-            if command:
-                states.clear()
-                print(command)
+            command_right = detect_commands(Commands, states_right)
+            if command_right:
+                states_left.clear()
+                print("Right command:", command_right)
 
             cv2.imshow('MediaPipe Holistic', image)
             if cv2.waitKey(5) & 0xFF == 27:
