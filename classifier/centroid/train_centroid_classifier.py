@@ -6,19 +6,18 @@ import numpy as np
 import pandas as pd
 
 from data.loader import DataLoader
-from utils.normalized import NormalizedData
+from utils.distance_normalization import NormalizedData
 
 
 def train_centroid_classifier(model_filename='01.json'):
-    loader = DataLoader(Path("../../data/"))
+    loader = DataLoader(Path("data/"))
     data = loader.load_all()
     unique_labels = set(entry.label for entry in data)
     centroids = {label: [] for label in unique_labels}
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
-        # TODO: use normalized_data.normal ?
-        centroids[entry.label].append(normalized_data.direction)
+        centroids[entry.label].append(normalized_data.distance)
 
     data = {}
     for label in unique_labels:
@@ -32,7 +31,14 @@ def train_centroid_classifier(model_filename='01.json'):
     cutoff = 0
     _distances = []
     for label, centroid in centroids.items():
-        distances = np.linalg.norm(data[label] - centroid, axis=(1, 2))
+        print(data[label])
+        print(centroid)
+        print(data[label].shape)
+        print(centroid.shape)
+        print(data[label] - centroid)
+        print((data[label] - centroid).shape)
+        distances = np.linalg.norm(data[label] - centroid, axis=1)
+        print(distances.shape)
         _distances.append(distances)
         max_distance = distances.max()
         cutoff = max(cutoff, max_distance)
@@ -54,5 +60,6 @@ def train_centroid_classifier(model_filename='01.json'):
     print(f'Consider adjusting cutoff in {model_filename} as necessary according to distance histogram!')
     plt.show()
 
+
 if __name__ == '__main__':
-    train_centroid_classifier()
+    train_centroid_classifier('02.json')

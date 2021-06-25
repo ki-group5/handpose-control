@@ -4,7 +4,7 @@ import numpy as np
 
 
 class CentroidClassifier:
-    def __init__(self, classifier_file='01.json'):
+    def __init__(self, classifier_file='02.json'):
         classifier_file = f'{os.path.dirname(os.path.abspath(__file__))}/params/{classifier_file}'
         with open(classifier_file) as f:
             deserialized_classifier = json.load(f)
