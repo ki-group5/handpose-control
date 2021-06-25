@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from data.loader import DataLoader
 from utils.normalized import NormalizedData
@@ -29,8 +30,11 @@ def train_centroid_classifier(model_filename='01.json'):
 
     # find cutoff
     cutoff = 0
+    _distances = []
     for label, centroid in centroids.items():
-        max_distance = np.linalg.norm(data[label] - centroid, axis=(1, 2)).max()
+        distances = np.linalg.norm(data[label] - centroid, axis=(1, 2))
+        _distances.append(distances)
+        max_distance = distances.max()
         cutoff = max(cutoff, max_distance)
 
     classifier_data = {
@@ -43,6 +47,12 @@ def train_centroid_classifier(model_filename='01.json'):
     with open(model_filename, 'w') as f:
         json.dump(classifier_data, f)
 
+    import matplotlib.pyplot as plt
+    distances = np.concatenate(_distances)
+    quantiles = pd.Series(distances)
+    quantiles.plot(kind='hist', bins=20)
+    print(f'Consider adjusting cutoff in {model_filename} as necessary according to distance histogram!')
+    plt.show()
 
 if __name__ == '__main__':
     train_centroid_classifier()
