@@ -1,4 +1,7 @@
 
+from data.data_file import Label
+from controller.state import Cmd, StateStream, detect_commands
+from typing import Dict, List, Optional, Tuple
 import cv2
 import numpy as np
 
@@ -6,6 +9,14 @@ from classifier.centroid.centroid_classifier import CentroidClassifier
 from utils.render import PoseRender
 from utils.normalized import NormalizedData
 from vec_math import Quat
+
+
+
+Commands: Dict[str, List[Cmd]] = {
+    "stop": [Cmd("fist", 0.8, 2.0), Cmd("flat", 0.2, 1.0), Cmd("fist", 0.8, 20.0)],
+    # "continue": [Cmd("index", 0.3, 20.0), Cmd("fist", 1.0, 2.0)]
+}
+
 
 
 def example_normalization():
@@ -18,13 +29,20 @@ def example_normalization():
     # mp_hands = mp.solutions.hands
     mp_holistic = mp.solutions.holistic
 
+
+    # Pose classifier
     classifier = CentroidClassifier()
+
+    # Command state machine from pose
+    labels = [l.value for l in Label]
+    states = StateStream(labels, 10)
+    
 
     # For webcam input:
     cap = cv2.VideoCapture(0)
     with mp_holistic.Holistic(
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5) as holistic:
+            min_detection_confidence=0.7,
+            min_tracking_confidence=0.7) as holistic:
         while cap.isOpened():
             success, image = cap.read()
             if not success:
@@ -48,16 +66,21 @@ def example_normalization():
 
             # mp_drawing.draw_landmarks(
             #     image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-                image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-                image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-                image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #     image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #     image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            # mp_drawing.draw_landmarks(
+            #     image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+
 
 
             if results.left_hand_landmarks:
                 left = NormalizedData.create_from_mediapipe(results.left_hand_landmarks.landmark, "Left")
+
+                left_reconstr = left.reconstruct()
+                PoseRender.render_landmarks(image, left_reconstr, mp_holistic.HAND_CONNECTIONS)
+                
                 PoseRender.draw_normal(left, image)
                 prediction = classifier.classify(left.direction)
                 cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
@@ -65,11 +88,22 @@ def example_normalization():
 
             if results.right_hand_landmarks:
                 right = NormalizedData.create_from_mediapipe(results.right_hand_landmarks.landmark, "Right")
+
+                right_reconstr = right.reconstruct()
+                PoseRender.render_landmarks(image, right_reconstr, mp_holistic.HAND_CONNECTIONS)
+
                 PoseRender.draw_normal(right, image)
                 prediction = classifier.classify(right.direction)
                 cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
+                states.push(prediction)
+
+
+            command = detect_commands(Commands, states)
+            if command:
+                states.clear()
+                print(command)
 
             cv2.imshow('MediaPipe Holistic', image)
             if cv2.waitKey(5) & 0xFF == 27:

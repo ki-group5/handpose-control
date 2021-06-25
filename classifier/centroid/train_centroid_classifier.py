@@ -39,6 +39,7 @@ def train_centroid_classifier(model_filename='01.json'):
     }
 
     model_filename = f'{os.path.dirname(os.path.abspath(__file__))}/params/{model_filename}'
+    Path(model_filename).parent.mkdir(exist_ok=True)
     with open(model_filename, 'w') as f:
         json.dump(classifier_data, f)
 

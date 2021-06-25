@@ -51,3 +51,16 @@ class Quat:
     def __str__(self):
         return str(self.to_vec())
 
+
+
+def test_quat():
+    q = Quat.create_from_to((1,0,0),(1,1,0))
+    print((1,1,0), q * (1,0,0))
+
+    x = np.array([(1,0,0),(0,1,0),(1,1,0),(0,0,1)])
+    print(q * x)
+    print(np.array([q * e for e in x]))
+
+if __name__ == "__main__":
+    test_quat()
+
