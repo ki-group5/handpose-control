@@ -46,22 +46,22 @@ def example_normalization():
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # mp_drawing.draw_landmarks(
-            #     image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-                image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            #mp_drawing.draw_landmarks(
+                 #image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS)
+            #mp_drawing.draw_landmarks(
+                #image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             mp_drawing.draw_landmarks(
                 image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-            mp_drawing.draw_landmarks(
-                image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+            #mp_drawing.draw_landmarks(
+                #image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
 
-
-            if results.left_hand_landmarks:
-                left = NormalizedData.create_from_mediapipe(results.left_hand_landmarks.landmark, "Left")
-                PoseRender.draw_normal(left, image)
-                prediction = classifier.classify(left.direction)
-                cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
-                            fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
+            
+            #if results.left_hand_landmarks:
+            #    left = NormalizedData.create_from_mediapipe(results.left_hand_landmarks.landmark, "Left")
+            #    PoseRender.draw_normal(left, image)
+            #    prediction = classifier.classify(left.direction)
+            #    cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
+            #                fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
             if results.right_hand_landmarks:
                 right = NormalizedData.create_from_mediapipe(results.right_hand_landmarks.landmark, "Right")
