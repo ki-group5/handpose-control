@@ -38,10 +38,14 @@ def train_lstm_classifier(model_filename='01.json'):
     x_train = np.random.random((100, 10, 21))
     #print(x_train[99])
     y_train = np.random.random((100, 1))
-    print(y_train[99])
+    #print(y_train[99])
+    
+    #print(data)
     model.fit(x_train, y_train, batch_size=300, epochs=20)
 
-    y_result = model.predict(x_train[0])
+    data2_shaped = x_train[0].reshape(1,10,21)
+    y_result = model.predict(data2_shaped)
+    print(y_result)
 
     for entry in data:
         normalized_data = NormalizedData.create(entry.landmarks, entry.hand.name)
