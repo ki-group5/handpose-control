@@ -1,6 +1,6 @@
 
 from data.data_file import Label
-from controller.state import Cmd, StateStream, detect_commands
+from controller.command import Cmd, Commander
 from typing import Dict, List, Optional, Tuple
 import cv2
 import numpy as np
@@ -12,9 +12,9 @@ from vec_math import Quat
 
 
 
-Commands: Dict[str, List[Cmd]] = {
-    "stop": [Cmd("fist", 0.8, 2.0), Cmd("flat", 0.2, 1.0), Cmd("fist", 0.8, 20.0)],
-    "continue": [Cmd("index", 0.3, 20.0), Cmd("fist", 1.0, 2.0)]
+COMMANDS: Dict[str, List[Cmd]] = {
+    "stop": [Cmd("flat", 0.9), Cmd("fist", 0.9), Cmd("flat", 0.9)],
+    "continue": [Cmd("index", 0.9), Cmd("fist", 0.9)]
 }
 
 
@@ -35,8 +35,9 @@ def example_normalization():
 
     # Command state machine from pose
     labels = [l.value for l in Label]
-    states_left = StateStream(labels, 10)
-    states_right = StateStream(labels, 10)
+
+    commander_left = Commander(COMMANDS, labels)
+    commander_right = Commander(COMMANDS, labels)
     
 
     # For webcam input:
@@ -87,9 +88,10 @@ def example_normalization():
                 cv2.putText(image, f'Left: {prediction}', color=(255, 0, 0), org=(100, 150),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
-                states_left.push(prediction)
+
+                commander_left.push(prediction)
             else:
-                states_left.push(None)
+                commander_left.push(None)
 
             if results.right_hand_landmarks:
                 right = NormalizedData.create_from_mediapipe(results.right_hand_landmarks.landmark, "Right")
@@ -102,20 +104,20 @@ def example_normalization():
                 cv2.putText(image, f'Right: {prediction}', color=(255, 0, 0), org=(100, 100),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)
 
-                states_right.push(prediction)
+                commander_right.push(prediction)
             else:
-                states_right.push(None)
+                commander_left.push(None)
 
-            command_left = detect_commands(Commands, states_left)
-            if command_left:
-                states_left.clear()
-                print("Left command:", command_left)
+            # command_left = detect_commands(Commands, states_left)
+            # if command_left:
+            #     states_left.clear()
+            #     print("Left command:", command_left)
 
 
-            command_right = detect_commands(Commands, states_right)
-            if command_right:
-                states_left.clear()
-                print("Right command:", command_right)
+            # command_right = detect_commands(Commands, states_right)
+            # if command_right:
+            #     states_left.clear()
+            #     print("Right command:", command_right)
 
             cv2.imshow('MediaPipe Holistic', image)
             if cv2.waitKey(5) & 0xFF == 27:

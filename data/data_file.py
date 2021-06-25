@@ -13,7 +13,7 @@ class Label(Enum):
     Fist = "fist"
     Index = "index"
     # Stop = "stop"
-    Ok = "ok"
+    # Ok = "ok"
     # Arrow = "arrow"
     # ThumbUp = "thumbup"
     # ThumbDown = "thumbdown"
