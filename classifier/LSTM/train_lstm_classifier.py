@@ -2,6 +2,14 @@ import sys
 sys.path[0] += '\\..'
 sys.path[0] += '\\..'
 
+
+import numpy
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Dropout
+from keras.layers import LSTM
+from keras.utils import np_utils
+
 import json
 import os
 from pathlib import Path
@@ -12,7 +20,8 @@ from data.loader import DataLoader
 from utils.normalized import NormalizedData
 
 
-def train_centroid_classifier(model_filename='01.json'):
+def train_lstm_classifier(model_filename='01.json'):
+    return
     loader = DataLoader(Path("./data/"))
     data = loader.load_all()
     unique_labels = set(entry.label for entry in data)
@@ -51,4 +60,4 @@ def train_centroid_classifier(model_filename='01.json'):
 
 
 if __name__ == '__main__':
-    train_centroid_classifier()
+    train_lstm_classifier()

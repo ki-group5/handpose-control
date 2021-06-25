@@ -3,7 +3,7 @@ import json
 import numpy as np
 
 
-class CentroidClassifier:
+class LSTMClassifier:
     def __init__(self, classifier_file='01.json'):
         classifier_file = f'{os.path.dirname(os.path.abspath(__file__))}/params/{classifier_file}'
         with open(classifier_file) as f:
